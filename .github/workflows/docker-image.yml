@@ -21,10 +21,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Docker Image Version
-      run: echo Image ${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+      run: |
+        echo "IMAGE_VERSION=${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}" >> $GITHUB_ENV
+        echo Docker Image $IMAGE_VERSION
     - name: Login Docker Hub
       run: docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ env.APP_NAME }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+    - name: Build Docker Image
+      run: docker build -t ${{ env.APP_NAME }} . 
+    - name: Tag Docker Image
+      run: docker tag ${{ env.APP_NAME }} ${{ env.APP_NAME }}:${{ env.IMAGE_VERSION }}
     - name: Upload Docker image (tagged)
-      run: docker push ${{ env.APP_NAME }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+      run: docker push ${{ env.APP_NAME }}:${{ env.IMAGE_VERSION }}
+    - name: Upload Docker image (latest)
+      run: docker push ${{ env.APP_NAME }}
