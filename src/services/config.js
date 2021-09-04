@@ -1,6 +1,6 @@
 const { v4: uuid } = require('uuid');
 const { Op } = require('sequelize');
-const { Configuration, ConfigurationAudit } = require('../database');
+const { Configuration } = require('../database');
 const { L } = require('../logger')('Configuration Service');
 
 const mapConfig = (rawConfig) => {
