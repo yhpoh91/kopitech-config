@@ -1,0 +1,30 @@
+name: Upload Docker
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+env:
+  APP_NAME: 'yhpoh91/kopitech-config'
+  VERSION_MAJOR: 1
+  VERSION_MINOR: $(date -u +"%Y%m%d")
+  VERSION_PATCH: $(date -u +"%H%M%S")
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build_docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker Image Version
+      run: echo Image ${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+    - name: Login Docker Hub
+      run: docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{ env.APP_NAME }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+    - name: Upload Docker image (tagged)
+      run: docker push ${{ env.APP_NAME }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
